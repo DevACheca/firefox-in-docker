@@ -25,7 +25,7 @@ RUN mkdir /tmp/xpra-html5 && \
 VOLUME /tmp/.X11-unix
 
 # Copy custom binaries from the local bin directory to the container
-COPY bin/* /usr/local/bin/
+# COPY bin/* /usr/local/bin/
 
 # Set environment variables for Xpra and general configuration
 ENV DISPLAY=":14"            \
@@ -56,7 +56,7 @@ ENV GID="1000"         \
 EXPOSE $XPRA_TCP_PORT $XPRA_WS_PORT
 
 # Set the entry point and default command for the container
-ENTRYPOINT ["/usr/local/bin/run"]
+# ENTRYPOINT ["/usr/local/bin/run"]
 
 # Start Firefox along with xhost command
 CMD ["sh", "-c", "xhost + && firefox"]
