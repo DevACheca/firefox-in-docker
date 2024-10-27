@@ -3,6 +3,9 @@ FROM debian:bookworm
 # Make sure apt doesn't sit and wait for input
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Set DISTRIB_ID to make Xpra recognize the distribution
+ENV DISTRIB_ID=debian
+
 # Install necessary packages and dependencies for building Xpra
 RUN \
     apt-get update && \
