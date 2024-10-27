@@ -1,4 +1,4 @@
-FROM garo/easy-xpra:latest
+FROM garo/easy-xpra:alpine
 ARG APPUSERUID=1000
 ARG APPGROUPGID=1000
 
