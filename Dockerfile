@@ -18,7 +18,7 @@ RUN \
         curl \
         wget \
         ca-certificates \
-        lsb-release && \  # Install lsb-release here
+        lsb-release && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Import the key used for signing the packages
