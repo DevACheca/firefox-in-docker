@@ -2,10 +2,7 @@ FROM garo/easy-xpra:latest
 ARG APPUSERUID=1000
 ARG APPGROUPGID=1000
 
-
-RUN apk add --no-cache --update py3-cairo
-RUN apk add --no-cache --update firefox-esr
-RUN apk add --no-cache --update ttf-dejavu
+RUN apk update && apk add --no-cache --update py3-cairo firefox ttf-dejavu
 
 COPY generatemachineid.py /root/generatemachineid.py
 RUN /root/generatemachineid.py > /etc/machine-id && rm /root/generatemachineid.py
@@ -25,5 +22,5 @@ IsRelative=1\n\
 Path=abcdefgh.default\n\
 ' > .mozilla/firefox/profiles.ini
 
-#Run firefox in xpra
+# Run firefox in xpra
 CMD ["run_in_xpra", "firefox"]
