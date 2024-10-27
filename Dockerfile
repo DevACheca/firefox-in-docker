@@ -6,11 +6,19 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install necessary packages
 RUN \
     apt-get update && \
-    apt-get install -y firefox-esr xpra libpci3 python3 python3-uinput python3-netifaces python3-pyinotify ffmpeg vlc curl && \
+    apt-get install -y \
+        firefox-esr \
+        libpci3 \
+        python3 \
+        python3-uinput \
+        python3-netifaces \
+        python3-pyinotify \
+        ffmpeg \
+        vlc \
+        curl \
+        wget \  # Install wget here
+        ca-certificates && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
-
-# Ensure SSL certificates are up to date
-RUN apt-get install -y ca-certificates
 
 # Import the key used for signing the packages
 RUN wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc
