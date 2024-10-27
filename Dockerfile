@@ -10,8 +10,7 @@ RUN apk add --no-cache \
     su-exec \
     xhost \
     xpra \
-    firefox && \
-    ln -sf /usr/bin/bash /bin/bash  # Create symlink for bash in /bin
+    firefox
 
 # Clone the xpra-html5 repository and install it
 RUN mkdir /tmp/xpra-html5 && \
