@@ -11,6 +11,5 @@ xpra start $XPRA_DISPLAY \
     --pulseaudio=no \
     --start-child="$@" \
     --bind-tcp=0.0.0.0:$XPRA_PORT \
-    --http=0.0.0.0:$HTTP_PORT \  # Enable HTTP upgrades
-    --no-daemon \
-    --exit-with-children
+    --http=0.0.0.0:$HTTP_PORT \
+    --no-daemon
