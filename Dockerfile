@@ -1,29 +1,47 @@
-FROM garo/easy-xpra:latest
-ARG APPUSERUID=1000
-ARG APPGROUPGID=1000
+FROM debian:bookworm
 
+# Make sure apt doesn't sit and wait for input
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apk add --no-cache --update py3-cairo
-RUN apk add --no-cache --update firefox-esr
-RUN apk add --no-cache --update ttf-dejavu
+# Install necessary packages
+RUN \
+    apt-get update && \
+    apt-get install -y \
+        firefox-esr \
+        libpci3 \
+        python3 \
+        python3-uinput \
+        python3-netifaces \
+        python3-pyinotify \
+        ffmpeg \
+        vlc \
+        curl \
+        wget \
+        ca-certificates \
+        lsb-release && \  # Install lsb-release here
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
-COPY generatemachineid.py /root/generatemachineid.py
-RUN /root/generatemachineid.py > /etc/machine-id && rm /root/generatemachineid.py
+# Import the key used for signing the packages
+RUN wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc
 
-RUN addgroup --gid $APPGROUPGID appgroup && adduser --disabled-password --uid $APPUSERUID --ingroup appgroup appuser
+# Add the Xpra repository
+RUN echo "deb [signed-by=/usr/share/keyrings/xpra.asc] https://xpra.org/bookworm main" \
+    > /etc/apt/sources.list.d/xpra.list  # Use "bookworm" directly
 
-USER appuser
-WORKDIR /home/appuser
-RUN mkdir -p .mozilla/firefox/abcdefgh.default
-RUN echo 'user_pref("browser.tabs.remote.autostart", false);' > .mozilla/firefox/abcdefgh.default/user.js
-RUN echo '[General]\n\
-StartWithLastProfile=1\n\
-\n\
-[Profile0]\n\
-Name=Default User\n\
-IsRelative=1\n\
-Path=abcdefgh.default\n\
-' > .mozilla/firefox/profiles.ini
+# Update the package list and install Xpra
+RUN apt-get update && apt-get install -y xpra
 
-#Run firefox in xpra
-CMD ["run_in_xpra", "firefox"]
+# Setup a non-root user
+ARG NON_ROOT_USERNAME=container
+ARG NON_ROOT_UID=1000
+ARG NON_ROOT_GID=1000
+
+RUN \
+    groupadd --gid $NON_ROOT_GID $NON_ROOT_USERNAME && \
+    useradd --uid $NON_ROOT_UID --gid $NON_ROOT_GID -m $NON_ROOT_USERNAME
+
+USER $NON_ROOT_USERNAME
+
+EXPOSE 10000
+
+ENTRYPOINT ["xpra", "start", "--daemon=no", "--start=firefox", "--bind-tcp=0.0.0.0:10000"]
