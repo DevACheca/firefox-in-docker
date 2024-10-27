@@ -2,7 +2,7 @@ FROM garo/easy-xpra:alpine
 ARG APPUSERUID=1000
 ARG APPGROUPGID=1000
 
-RUN apk update && apk add --no-cache --update py3-cairo firefox ttf-dejavu
+RUN apk update && apk add --no-cache --update py3-cairo firefox-esr ttf-dejavu
 
 COPY generatemachineid.py /root/generatemachineid.py
 RUN /root/generatemachineid.py > /etc/machine-id && rm /root/generatemachineid.py
