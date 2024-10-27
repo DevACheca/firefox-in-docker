@@ -1,32 +1,28 @@
-# Use Alpine Linux as the base image
-FROM alpine:latest
+FROM debian:bookworm
 
-# Install necessary packages
-RUN apk add --no-cache \
-    firefox \
-    xpra \
-    xorg-server \
-    xf86-video-dummy \
-    dbus \
-    ttf-freefont \
-    bash \
-    && mkdir -p /root/.xpra \
-    && adduser -D xprauser \
-    && mkdir -p /tmp/xpra-user && chown xprauser:xprauser /tmp/xpra-user
+# Make sure apt doesn't sit and wait for input
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Create a start script to run Xpra and log output as root
-USER root
-RUN echo '#!/bin/sh\nexec xpra start :10000 --start-child=firefox --web --html=on --bind-tcp=0.0.0.0:10000 --exit-with-children' > /usr/local/bin/start-xpra.sh && \
-    chmod +x /usr/local/bin/start-xpra.sh
+# Install required packages and add Xpra repository
+RUN apt-get update && \
+    apt-get install -y wget ca-certificates && \
+    wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
+    echo "deb [signed-by=/usr/share/keyrings/xpra.asc] https://xpra.org/ubuntu/ focal main" \
+        > /etc/apt/sources.list.d/xpra.list && \
+    apt-get update && \
+    apt-get install -y firefox-esr xpra libpci3 python3 python3-uinput python3-netifaces python3-pyinotify ffmpeg vlc curl && \
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
-# Switch to the non-root user
-USER xprauser
+# Setup a non-root user
+ARG NON_ROOT_USERNAME=container
+ARG NON_ROOT_UID=1000
+ARG NON_ROOT_GID=1000
 
-# Set environment variables for Xpra
-ENV XPRA_PORT=10000 \
-    XPRA_SERVER=":10000" \
-    DISPLAY=":0" \
-    XDG_RUNTIME_DIR="/tmp/xpra-user"
+RUN groupadd --gid $NON_ROOT_GID $NON_ROOT_USERNAME && \
+    useradd --uid $NON_ROOT_UID --gid $NON_ROOT_GID -m $NON_ROOT_USERNAME
 
-# Set the entrypoint to the start script and redirect stderr to stdout
-ENTRYPOINT ["/bin/sh", "-c", "/usr/local/bin/start-xpra.sh 2>&1"]
+USER $NON_ROOT_USERNAME
+
+EXPOSE 10000
+
+ENTRYPOINT ["xpra", "start", "--daemon=no", "--start=firefox", "--bind-tcp=0.0.0.0:10000"]
