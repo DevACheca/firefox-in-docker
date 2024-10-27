@@ -25,8 +25,8 @@ RUN \
 RUN wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc
 
 # Add the Xpra repository
-RUN echo "deb [signed-by=/usr/share/keyrings/xpra.asc] https://xpra.org/bookworm main" \
-    > /etc/apt/sources.list.d/xpra.list  # Use "bookworm" directly
+RUN echo "deb [signed-by=/usr/share/keyrings/xpra.asc] https://xpra.org/debian bookworm main" \
+    > /etc/apt/sources.list.d/xpra.list  # Specify "debian" directly
 
 # Update the package list and install Xpra
 RUN apt-get update && apt-get install -y xpra
