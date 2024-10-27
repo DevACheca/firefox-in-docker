@@ -25,6 +25,10 @@ RUN mkdir /tmp/xpra-html5 && \
 # Define volumes for X11 socket
 VOLUME /tmp/.X11-unix
 
+# Create a simple startup script for Xpra
+RUN echo '#!/bin/bash\nxhost + && xpra start --bind-tcp=0.0.0.0:$XPRA_TCP_PORT --html=$XPRA_HTML --start=firefox --exit-with-children' > /usr/local/bin/run && \
+    chmod +x /usr/local/bin/run
+
 # Set environment variables for Xpra and general configuration
 ENV DISPLAY=":14"            \
     SHELL="/usr/bin/bash"    \
@@ -53,8 +57,5 @@ ENV GID="1000"         \
 # Expose only the necessary ports for Xpra
 EXPOSE $XPRA_TCP_PORT $XPRA_WS_PORT
 
-# Set the entry point and default command for the container
+# Set the entry point to the new run script
 ENTRYPOINT ["/usr/local/bin/run"]
-
-# Start Firefox along with xhost command
-CMD ["sh", "-c", "xhost + && firefox"]
