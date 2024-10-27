@@ -1,12 +1,24 @@
-FROM alpine:latest
+FROM alpine:3.18
 
-ARG APPUSERUID=1000
-ARG APPGROUPGID=1000
+# Install xpra
+RUN apk add --no-cache --update xpra
 
-# Install required packages
-RUN apk add --no-cache --update py3-cairo
-RUN apk add --no-cache --update ttf-dejavu
-RUN apk add --no-cache --update firefox-esr
+# Copy Xpra configuration files
+RUN cp /etc/xpra/xorg.conf /etc/X11/xorg.conf.d/00_xpra.conf
+RUN echo "xvfb=Xorg" >> /etc/xpra/xpra.conf
+
+# Set environment variables
+ENV XPRA_DISPLAY=":100"
+ARG XPRA_PORT=10000
+ENV XPRA_PORT=$XPRA_PORT
+EXPOSE $XPRA_PORT
+
+# Copy the run_in_xpra script to the appropriate directory
+COPY run_in_xpra /usr/bin/run_in_xpra
+RUN chmod +x /usr/bin/run_in_xpra
+
+# Install required packages, including Firefox
+RUN apk add --no-cache --update py3-cairo ttf-dejavu firefox-esr
 
 # Copy and prepare the machine ID generation script
 COPY generatemachineid.py /root/generatemachineid.py
@@ -14,6 +26,8 @@ RUN chmod +x /root/generatemachineid.py
 RUN /root/generatemachineid.py > /etc/machine-id && rm /root/generatemachineid.py
 
 # Create a user and group
+ARG APPUSERUID=1000
+ARG APPGROUPGID=1000
 RUN addgroup --gid $APPGROUPGID appgroup && adduser --disabled-password --uid $APPUSERUID --ingroup appgroup appuser
 
 # Switch to the new user
@@ -33,4 +47,4 @@ Path=abcdefgh.default\n\
 ' > .mozilla/firefox/profiles.ini
 
 # Run Firefox in xpra
-CMD ["run_in_xpra", "firefox"]
+CMD ["/usr/bin/run_in_xpra", "firefox"]
