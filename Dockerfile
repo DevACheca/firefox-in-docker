@@ -13,7 +13,12 @@ ARG XPRA_PORT=10000
 ENV XPRA_PORT=$XPRA_PORT
 EXPOSE $XPRA_PORT
 
-# Create required directories
+# Create user and group first
+ARG APPUSERUID=1000
+ARG APPGROUPGID=1000
+RUN addgroup --gid $APPGROUPGID appgroup && adduser --disabled-password --uid $APPUSERUID --ingroup appgroup appuser
+
+# Create required directories after user and group are created
 RUN mkdir -p /run/user/1000/xpra && chown -R appuser:appgroup /run/user/1000
 ENV XDG_RUNTIME_DIR=/run/user/1000
 
@@ -25,11 +30,6 @@ RUN chmod +x /usr/bin/run_in_xpra
 COPY generatemachineid.py /root/generatemachineid.py
 RUN chmod +x /root/generatemachineid.py
 RUN /root/generatemachineid.py > /etc/machine-id && rm /root/generatemachineid.py
-
-# Create a user and group
-ARG APPUSERUID=1000
-ARG APPGROUPGID=1000
-RUN addgroup --gid $APPGROUPGID appgroup && adduser --disabled-password --uid $APPUSERUID --ingroup appgroup appuser
 
 # Switch to the new user for non-Xpra commands
 USER appuser
