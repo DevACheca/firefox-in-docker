@@ -23,5 +23,9 @@ ENV XPRA_PORT=10000 \
     DISPLAY=":0" \
     XDG_RUNTIME_DIR="/tmp/xpra-user"
 
-# Start Xpra and Firefox
-CMD ["xpra", "start", ":10000", "--start-child=firefox", "--web", "--html=on", "--bind-tcp=0.0.0.0:10000", "--exit-with-children"]
+# Create a start script to run Xpra and log output
+RUN echo '#!/bin/sh\nexec xpra start :10000 --start-child=firefox --web --html=on --bind-tcp=0.0.0.0:10000 --exit-with-children' > /start-xpra.sh && \
+    chmod +x /start-xpra.sh
+
+# Set the entrypoint to the start script
+ENTRYPOINT ["/start-xpra.sh"]
