@@ -10,7 +10,11 @@ RUN apk add --no-cache \
     dbus \
     ttf-freefont \
     bash \
-    && mkdir -p /root/.xpra
+    && mkdir -p /root/.xpra \
+    && adduser -D xprauser
+
+# Switch to the non-root user
+USER xprauser
 
 # Set environment variables for Xpra
 ENV XPRA_PORT=10000 \
