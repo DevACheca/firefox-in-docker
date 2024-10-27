@@ -8,9 +8,23 @@ RUN \
     apt-get update && \
     apt-get install -y \
         git \
+        pkg-config \                  # Added pkg-config
         python3-pip \
         python3-setuptools \
         python3-dev \
+        libjpeg-dev \                 # Add necessary libraries
+        libavcodec-dev \
+        libavformat-dev \
+        libswscale-dev \
+        libx264-dev \
+        libx11-dev \
+        libxext-dev \
+        libxi-dev \
+        libxrender-dev \
+        libxrandr-dev \
+        libgtk-3-dev \
+        libpulse-dev \
+        libqt5svg5-dev \
         python3-uinput \
         python3-netifaces \
         python3-pyinotify \
