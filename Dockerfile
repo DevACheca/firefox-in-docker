@@ -4,17 +4,17 @@ FROM debian:bookworm
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y firefox-esr xpra libpci3 python3 python3-uinput python3-netifaces python3-pyinotify ffmpeg vlc curl git && \
+    apt-get install -y firefox-esr libpci3 python3 python3-uinput python3-netifaces python3-pyinotify ffmpeg vlc curl git && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Clone the xpra-html5 repository and install it
-RUN mkdir /tmp/xpra-html5 && \
-    cd /tmp/xpra-html5 && \
-    git clone https://github.com/Xpra-org/xpra-html5 && \
-    cd xpra-html5 && \
-    python3 setup.py install && \
+RUN mkdir /tmp/xpra && \
+    cd /tmp/xpra && \
+    git clone https://github.com/Xpra-org/xpra && \
+    cd xpra && \
+    python3 setup.py install-repo && \
     cd / && \
-    rm -rf /tmp/xpra-html5
+    rm -rf /tmp/xpra
 
 # Setup a non-root user
 ARG NON_ROOT_USERNAME=container
