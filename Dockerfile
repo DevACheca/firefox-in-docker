@@ -16,7 +16,7 @@ RUN \
         ffmpeg \
         vlc \
         curl \
-        wget \  # Install wget here
+        wget \
         ca-certificates && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
