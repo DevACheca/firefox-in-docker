@@ -3,4 +3,4 @@ services:
   firefox-in-docker:
     image: ghcr.io/devacheca/firefox-in-docker:main
     ports:
-      - 80:10000
+      - 10000:10000
