@@ -7,12 +7,8 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y wget ca-certificates && \
     wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
-    echo "Types: deb" > /etc/apt/sources.list.d/xpra.list && \
-    echo "URIs: https://xpra.org" >> /etc/apt/sources.list.d/xpra.list && \
-    echo "Suites: bookworm" >> /etc/apt/sources.list.d/xpra.list && \
-    echo "Components: main" >> /etc/apt/sources.list.d/xpra.list && \
-    echo "Signed-By: /usr/share/keyrings/xpra.asc" >> /etc/apt/sources.list.d/xpra.list && \
-    echo "Architectures: amd64 arm64" >> /etc/apt/sources.list.d/xpra.list && \
+    echo "deb [signed-by=/usr/share/keyrings/xpra.asc] https://xpra.org bookworm main" \
+        > /etc/apt/sources.list.d/xpra.list && \
     apt-get update && \
     apt-get install -y firefox-esr xpra libpci3 python3 python3-uinput python3-netifaces python3-pyinotify ffmpeg vlc curl && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
