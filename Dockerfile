@@ -3,45 +3,24 @@ FROM debian:bookworm
 # Make sure apt doesn't sit and wait for input
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Set DISTRIB_ID to make Xpra recognize the distribution
-ENV DISTRIB_ID=debian
-
-# Install necessary packages and dependencies for building Xpra
+# Install necessary packages
 RUN \
     apt-get update && \
-    apt-get install -y \
-        git \
-        pkg-config \
-        python3-pip \
-        python3-setuptools \
-        python3-dev \
-        libjpeg-dev \
-        libavcodec-dev \
-        libavformat-dev \
-        libswscale-dev \
-        libx264-dev \
-        libx11-dev \
-        libxext-dev \
-        libxi-dev \
-        libxrender-dev \
-        libxrandr-dev \
-        libgtk-3-dev \
-        libpulse-dev \
-        libqt5svg5-dev \
-        python3-uinput \
-        python3-netifaces \
-        python3-pyinotify \
-        ffmpeg \
-        vlc \
-        curl && \
+    apt-get install -y firefox-esr xpra libpci3 python3 python3-uinput python3-netifaces python3-pyinotify ffmpeg vlc curl && \
     rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
-# Clone and install the latest version of Xpra
-RUN \
-    git clone https://github.com/Xpra-org/xpra /opt/xpra && \
-    cd /opt/xpra && \
-    python3 setup.py install-repo && \
-    pip3 install xpra
+# Ensure SSL certificates are up to date
+RUN apt-get install -y ca-certificates
+
+# Import the key used for signing the packages
+RUN wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc
+
+# Add the Xpra repository
+RUN echo "deb [signed-by=/usr/share/keyrings/xpra.asc] https://xpra.org/$(lsb_release -cs) main" \
+    > /etc/apt/sources.list.d/xpra.list
+
+# Update the package list and install Xpra
+RUN apt-get update && apt-get install -y xpra
 
 # Setup a non-root user
 ARG NON_ROOT_USERNAME=container
