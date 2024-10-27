@@ -18,4 +18,4 @@ ENV XPRA_PORT=10000 \
     DISPLAY=":0"
 
 # Start Xpra and Firefox
-CMD ["xpra", "start", ":10000", "--start-child=firefox", "--web", "--html=on", "--bind-tcp=0.0.0.0:10000"]
+CMD ["xpra", "start", ":10000", "--start-child=firefox", "--web", "--html=on", "--bind-tcp=0.0.0.0:10000", "--exit-with-children"]
