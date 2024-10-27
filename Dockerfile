@@ -1,26 +1,21 @@
-FROM garo/easy-xpra:alpine
-ARG APPUSERUID=1000
-ARG APPGROUPGID=1000
+# Use Alpine Linux as the base image
+FROM alpine:latest
 
-RUN apk update && apk add --no-cache --update py3-cairo firefox-esr ttf-dejavu
+# Install necessary packages
+RUN apk add --no-cache \
+    firefox \
+    xpra \
+    xorg-server \
+    xf86-video-dummy \
+    dbus \
+    ttf-freefont \
+    bash \
+    && mkdir -p /root/.xpra
 
-COPY generatemachineid.py /root/generatemachineid.py
-RUN /root/generatemachineid.py > /etc/machine-id && rm /root/generatemachineid.py
+# Set environment variables for Xpra
+ENV XPRA_PORT=10000 \
+    XPRA_SERVER=":10000" \
+    DISPLAY=":0"
 
-RUN addgroup --gid $APPGROUPGID appgroup && adduser --disabled-password --uid $APPUSERUID --ingroup appgroup appuser
-
-USER appuser
-WORKDIR /home/appuser
-RUN mkdir -p .mozilla/firefox/abcdefgh.default
-RUN echo 'user_pref("browser.tabs.remote.autostart", false);' > .mozilla/firefox/abcdefgh.default/user.js
-RUN echo '[General]\n\
-StartWithLastProfile=1\n\
-\n\
-[Profile0]\n\
-Name=Default User\n\
-IsRelative=1\n\
-Path=abcdefgh.default\n\
-' > .mozilla/firefox/profiles.ini
-
-# Run firefox in xpra
-CMD ["run_in_xpra", "firefox"]
+# Start Xpra and Firefox
+CMD ["xpra", "start", ":10000", "--start-child=firefox", "--web", "--html=on", "--bind-tcp=0.0.0.0:10000"]
