@@ -8,11 +8,11 @@ RUN \
     apt-get update && \
     apt-get install -y \
         git \
-        pkg-config \                  # Added pkg-config
+        pkg-config \
         python3-pip \
         python3-setuptools \
         python3-dev \
-        libjpeg-dev \                 # Add necessary libraries
+        libjpeg-dev \
         libavcodec-dev \
         libavformat-dev \
         libswscale-dev \
