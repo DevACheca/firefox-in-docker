@@ -1,9 +1,9 @@
 FROM alpine:3.18
 
-# Install xpra
-RUN apk add --no-cache --update xpra
+# Install necessary packages
+RUN apk add --no-cache --update xpra py3-paramiko py3-cairo ttf-dejavu firefox-esr
 
-# Copy Xpra configuration files
+# Set up Xpra configuration
 RUN cp /etc/xpra/xorg.conf /etc/X11/xorg.conf.d/00_xpra.conf
 RUN echo "xvfb=Xorg" >> /etc/xpra/xpra.conf
 
@@ -13,12 +13,13 @@ ARG XPRA_PORT=10000
 ENV XPRA_PORT=$XPRA_PORT
 EXPOSE $XPRA_PORT
 
+# Create required directories
+RUN mkdir -p /run/user/1000
+ENV XDG_RUNTIME_DIR=/run/user/1000
+
 # Copy the run_in_xpra script to the appropriate directory
 COPY run_in_xpra /usr/bin/run_in_xpra
 RUN chmod +x /usr/bin/run_in_xpra
-
-# Install required packages, including Firefox
-RUN apk add --no-cache --update py3-cairo ttf-dejavu firefox-esr
 
 # Copy and prepare the machine ID generation script
 COPY generatemachineid.py /root/generatemachineid.py
