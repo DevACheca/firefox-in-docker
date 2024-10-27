@@ -14,7 +14,7 @@ ENV XPRA_PORT=$XPRA_PORT
 EXPOSE $XPRA_PORT
 
 # Create required directories
-RUN mkdir -p /run/user/1000
+RUN mkdir -p /run/user/1000/xpra && chown -R appuser:appgroup /run/user/1000
 ENV XDG_RUNTIME_DIR=/run/user/1000
 
 # Copy the run_in_xpra script to the appropriate directory
@@ -31,7 +31,7 @@ ARG APPUSERUID=1000
 ARG APPGROUPGID=1000
 RUN addgroup --gid $APPGROUPGID appgroup && adduser --disabled-password --uid $APPUSERUID --ingroup appgroup appuser
 
-# Switch to the new user
+# Switch to the new user for non-Xpra commands
 USER appuser
 WORKDIR /home/appuser
 
@@ -46,6 +46,9 @@ Name=Default User\n\
 IsRelative=1\n\
 Path=abcdefgh.default\n\
 ' > .mozilla/firefox/profiles.ini
+
+# Switch back to root for Xpra command
+USER root
 
 # Run Firefox in xpra
 CMD ["/usr/bin/run_in_xpra", "firefox"]
