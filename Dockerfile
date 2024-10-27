@@ -1,16 +1,12 @@
-# Use the latest version of Alpine Linux as the base image
-FROM alpine:3.17
+FROM debian:bookworm
 
-# Install necessary packages and link bash for compatibility
-RUN apk add --no-cache \
-    bash \
-    git \
-    py3-cairo \
-    py3-xdg \
-    su-exec \
-    xhost \
-    xpra \
-    firefox
+# make sure apt doesn't sit and wait for input
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN \
+    apt-get update && \
+    apt-get install -y firefox-esr xpra libpci3 python3 python3-uinput python3-netifaces python3-pyinotify ffmpeg vlc curl && \
+    rm -rf /var/cache/apt/archives /var/lib/apt/lists/*
 
 # Clone the xpra-html5 repository and install it
 RUN mkdir /tmp/xpra-html5 && \
@@ -21,42 +17,18 @@ RUN mkdir /tmp/xpra-html5 && \
     cd / && \
     rm -rf /tmp/xpra-html5
 
-# Define volumes for X11 socket
-VOLUME /tmp/.X11-unix
 
-# Copy custom binaries from the local bin directory to the container
-# COPY bin/* /usr/local/bin/
+# setup a non-root-user
+ARG NON_ROOT_USERNAME=container
+ARG NON_ROOT_UID=1000
+ARG NON_ROOT_GID=1000
 
-# Set environment variables for Xpra and general configuration
-ENV DISPLAY=":14"            \
-    SHELL="/usr/bin/bash"    \
-    START_XORG="yes"         \
-    XPRA_HTML="no"           \
-    XPRA_MODE="start"        \
-    XPRA_READONLY="no"       \
-    XORG_DPI="96"            \
-    XPRA_COMPRESS="0"        \
-    XPRA_DPI="0"             \
-    XPRA_ENCODING="rgb"      \
-    XPRA_HTML_DPI="96"       \
-    XPRA_KEYBOARD_SYNC="yes" \
-    XPRA_MMAP="yes"          \
-    XPRA_SHARING="yes"       \
-    XPRA_TCP_PORT="10000"    \
-    XPRA_WS_PORT="10001"
+RUN \
+    groupadd --gid $NON_ROOT_GID $NON_ROOT_USERNAME && \
+    useradd --uid $NON_ROOT_UID --gid $NON_ROOT_GID -m $NON_ROOT_USERNAME
 
-# User configuration
-ENV GID="1000"         \
-    GNAME="xpra"       \
-    UHOME="/home/xpra" \
-    UID="1000"         \
-    UNAME="xpra"
+USER $NON_ROOT_USERNAME
 
-# Expose only the necessary ports for Xpra
-EXPOSE $XPRA_TCP_PORT $XPRA_WS_PORT
+EXPOSE 10000
 
-# Set the entry point and default command for the container
-# ENTRYPOINT ["/usr/local/bin/run"]
-
-# Start Firefox along with xhost command
-CMD ["sh", "-c", "xhost + && firefox"]
+ENTRYPOINT ["xpra", "start", "--daemon=no", "--start=firefox", "--bind-tcp=0.0.0.0:10000"]
