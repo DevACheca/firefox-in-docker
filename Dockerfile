@@ -1,11 +1,11 @@
-FROM alpine:3.18  # or another appropriate version
+FROM alpine:3.18
 
 ARG APPUSERUID=1000
 ARG APPGROUPGID=1000
 
 RUN apk add --no-cache --update py3-cairo
 RUN apk add --no-cache --update ttf-dejavu
-RUN apk add --no-cache --update firefox-esr  # Ensure this works with the chosen Alpine version
+RUN apk add --no-cache --update firefox-esr
 
 COPY generatemachineid.py /root/generatemachineid.py
 RUN /root/generatemachineid.py > /etc/machine-id && rm /root/generatemachineid.py
