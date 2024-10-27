@@ -7,11 +7,16 @@ RUN apk add --no-cache --update xpra py3-paramiko py3-cairo ttf-dejavu firefox-e
 RUN cp /etc/xpra/xorg.conf /etc/X11/xorg.conf.d/00_xpra.conf
 RUN echo "xvfb=Xorg" >> /etc/xpra/xpra.conf
 
+
 # Set environment variables
 ENV XPRA_DISPLAY=":100"
 ARG XPRA_PORT=10000
+ARG HTTP_PORT=20000
 ENV XPRA_PORT=$XPRA_PORT
+ENV HTTP_PORT=$HTTP_PORT
+ENV XDG_RUNTIME_DIR=/run/user/1000
 EXPOSE $XPRA_PORT
+EXPOSE $HTTP_PORT
 
 # Create user and group first
 ARG APPUSERUID=1000
