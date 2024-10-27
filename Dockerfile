@@ -1,4 +1,4 @@
-FROM debian:bullseye
+FROM debian:bookworm
 
 # make sure apt doesn't sit and wait for input
 ENV DEBIAN_FRONTEND=noninteractive
