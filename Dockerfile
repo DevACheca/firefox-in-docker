@@ -3,7 +3,7 @@ FROM debian:bookworm
 # Make sure apt doesn't sit and wait for input
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install required packages and add the Xpra repository
+# Setup Xpra repository, download latest required packages and install them
 RUN apt-get update && \
     apt-get install -y wget ca-certificates && \
     wget -O "/usr/share/keyrings/xpra.asc" https://xpra.org/xpra.asc && \
